@@ -74,6 +74,38 @@ R CMD BATCH "$argString" "c_subset_ethnicities.R"
 ```
 
 
+```
+#!/bin/bash
+#SBATCH -p c2s8
+#SBATCH --job-name=testing
+#SBATCH --out=test.log
+#SBATCH --error=test.err
+# make temporary directory to run the script in
+# staging in data and container
+set -e # fail script on any error
+DIR=$(mktemp -d)
+cd "$DIR"
+
+# move appropriate data into tmp space from google bucket
+gsutil -q cp gs://… . &
+gsutil -q cp gs://… . &
+wait
+set +e restore normal error handling
+# do all of the code
+sleep 3
+echo "hello world :)"
+sleep 3
+cat << 'EOF' >outfile.txt
+hello world :)
+EOF
+# move results into google bucket (this is how Nick suggested, but I usually just copy like below)
+gsutil -m rsync -r $DIR/… gs://… &
+# or you can copy any files you made (and want to keep) back to gs
+gsutil -m cp outfile.txt gs://directory
+
+
+```
+
 ## Coldline Google Buckets
 ADRN - adrn_coldline\
 CAAPA - caapa_coldline\
