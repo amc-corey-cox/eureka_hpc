@@ -21,16 +21,33 @@ wait
 
 PATH=$DIR:$PATH
 
-#in the middle of a bash script I do this to run an R script
+#######
+
 cat << 'EOF' >c_subset_ethnicities.R
-library(tidyverse)
+library(data.table)
+for (arg in commandArgs(TRUE)){
+  eval(parse(text=arg))
+}
+print("The sumstats prefix is:")
+print(SSFNAME)
+EOF
+argString="--args SSFNAME=\"$SSFNAME\""
+echo "$argString"
+R CMD BATCH "$argString" "c_subset_ethnicities.R"
+
+######
+
+
+
+#in the middle of a bash script I do this to run an R script
+cat << 'EOF' > testing.R
 print(r_arg)
 EOF
 argString="--args r_arg=\"R works!\"" 
-echo "$argString"
-R CMD BATCH "$argString" "c_subset_ethnicities.R" > outfile.txt
 
-echo $PATH >> outfile.txt
+R CMD BATCH "${argString}" testing.R > outfile.txt
+
+echo "PATH=${PATH}" >> outfile.txt
 
 # do all of the code
 sleep 3
